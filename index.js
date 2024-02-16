@@ -1,7 +1,7 @@
 const input = document.getElementById("input");
 const output = document.getElementById("output");
 const num = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-
+const valid=["1","2","3","4","5","6","7","8","9","0","+","-","*","%","/",".","="]
 let currNum = "";
 let result = 0;
 let lastoperation = "";
@@ -54,8 +54,8 @@ const operate = (response) => {
 
 const calculate = (e) => {
     if (output.innerText === "Error") reset();
-    const response = e.innerText;
-    if (num.includes(parseInt(e.innerText))) {
+    const response = e;
+    if (num.includes(parseInt(e))) {
         currNum = currNum.concat(response.toString());
         if (lastoperation === "√x") {
             if (result !== 0) input.innerText = result + "√" + currNum;
@@ -121,3 +121,12 @@ const calculate = (e) => {
             break;
     }
 };
+
+document.addEventListener('keydown',(e)=>{
+    if(valid.includes(e.key))
+    calculate(e.key)
+    if(e.key==="Backspace")
+    calculate("C")
+    if(e.key==="Escape")
+    calculate("AC")
+})
