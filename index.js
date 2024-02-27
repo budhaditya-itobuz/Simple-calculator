@@ -1,8 +1,10 @@
 const input = document.getElementById("input");
 const output = document.getElementById("output");
+const buttons = document.querySelectorAll('.item')
 
-const num = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-const valid=["1","2","3","4","5","6","7","8","9","0","+","-","*","%","/",".","="]
+const num = new Array(10).fill(0).map((e, i) => i);
+let isErrorExist = false;
+
 let currNum = "";
 let result = 0;
 let lastoperation = "";
@@ -47,16 +49,17 @@ const operate = (response) => {
     if (!isFinite(result)) {
         reset();
         output.innerText = "Error";
-    } else if (isNaN(parseInt(result))) output.innerText = "";
-    else if (!Number.isInteger(result))
+    } else if (isNaN(parseInt(result))) {
+        output.innerText = "";
+    }
+    else if (!Number.isInteger(result)) {
         output.innerText = parseFloat(result.toFixed(5));
+    }
     else output.innerText = result;
 };
 
-const calculate = (e) => {
-    if (output.innerText === "Error") reset();
-    const response = e.innerText;
-    if (num.includes(parseInt(e.innerText))) {
+const calculate = (response) => {
+    if (num.includes(parseInt(response))) {
         currNum = currNum.concat(response.toString());
         if (lastoperation === "√x") {
             if (result !== 0) input.innerText = result + "√" + currNum;
@@ -67,6 +70,7 @@ const calculate = (e) => {
         } else input.innerText = currNum;
         return;
     }
+
     switch (response) {
         case ".":
             if (!(currNum.indexOf(".") > -1)) {
@@ -78,11 +82,15 @@ const calculate = (e) => {
             reset();
             break;
         case "C":
-            if (currNum % 1 !== 0) {
+            if (currNum.toString().length === 1 || input.innerText === "") {
+                input.innerText = ""
+                currNum = ""
+            }
+            else {
                 let str = currNum.toString();
                 str = str.substring(0, str.length - 1);
                 currNum = parseFloat(str);
-            } else currNum = Math.floor(currNum / 10);
+            }
             input.innerText = currNum;
             break;
         case "Π":
@@ -123,11 +131,20 @@ const calculate = (e) => {
     }
 };
 
-document.addEventListener('keydown',(e)=>{
-    if(valid.includes(e.key))
-    calculate(e.key)
-    if(e.key==="Backspace")
-    calculate("C")
-    if(e.key==="Escape")
-    calculate("AC")
+buttons.forEach(item => {
+    item.addEventListener('click', () => {
+        if (output.innerText === "Error")
+            reset();
+        calculate(item.innerText)
+    })
+})
+
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === "Escape")
+        calculate("AC")
+    else if (e.key === "Backspace")
+        calculate("C")
+    else if (num.includes(parseInt(e.key)) || ["+", "-", "/", ".", "*", "="].includes(e.key))
+        calculate(e.key.toString())
 })
